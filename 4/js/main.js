@@ -53,6 +53,7 @@ const surnamesBase = [
   'Огурцов',
   'Тапочкин'
 ];
+const usedCommentId = new Set ();
 function getRandom (min, max) {
   const lower = Math.ceil(Math.min(Math.abs(min), Math.abs(max)));
   const upper = Math.floor(Math.max(Math.abs(min), Math.abs(max)));
@@ -89,13 +90,14 @@ function getCommentName(name, surname) {
 
 function generateComment () {
   const comment = [];
-  const usedCommentId = new Set ();
+  // const usedCommentId = new Set ();
     let id;
-    let attempts = 0;
     do {
       id = getCommentId(1, 750);
-      attempts++;
-    } while (usedCommentId.has(id) && attempts < 750);
+      if (usedCommentId.size > 750) {
+        throw new Error(`Не могу найти уникальный ID комментария после 750 попыток`);
+      }
+    } while (usedCommentId.has(id));
     usedCommentId.add(id);
 
     comment.push({
@@ -104,6 +106,7 @@ function generateComment () {
       commentMessage: getCommentMessage(),
       commentName: getCommentName(namesBase, surnamesBase)
     });
+
 return comment;
 }
 const Comments = (amount) => {
@@ -130,10 +133,8 @@ const UploadedPhotos = (amount) => {
 
   for (let i = 0; i < amount; i++) {
     let id;
-    let idAttempts = 0;
     do {
       id = getId(1, amount);
-      idAttempts++;
       if (usedId.length >= amount) {
         throw new Error(`Не могу найти уникальный ID после ${amount} попыток`);
       }
@@ -141,10 +142,8 @@ const UploadedPhotos = (amount) => {
     usedId.add(id);
 
     let url;
-    let urlAttempts = 0;
     do {
       url = getUrl(1, amount);
-      urlAttempts++;
       if (usedUrl.length >= amount) {
         throw new Error(`Не могу найти уникальный URL после ${amount} попыток`);
       }
@@ -156,4 +155,4 @@ const UploadedPhotos = (amount) => {
   return allPhotos;
 }
 
-console.log(UploadedPhotos(10));
+console.log(UploadedPhotos(25));
