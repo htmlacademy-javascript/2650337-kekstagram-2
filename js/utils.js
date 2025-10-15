@@ -1,15 +1,15 @@
-import {DESCRIPTION, COMMENTS, NAMES, SURNAMES} from './const.js';
+import {DESCRIPTIONS, COMMENTS, NAMES, SURNAMES} from './const.js';
 
 const usedCommentId = new Set();
 
-export function getRandomInteger (min, max) {
+export const getRandomInteger = (min, max) => {
   const lower = Math.ceil(Math.min(Math.abs(min), Math.abs(max)));
   const upper = Math.floor(Math.max(Math.abs(min), Math.abs(max)));
   const result = Math.random() * (upper - lower + 1) + lower;
   return Math.floor(result);
-}
+};
 
-export function getUniqueRandom (usedSet, min, max, errorMessage) {
+export const getUniqueRandom = (usedSet, min, max, errorMessage) => {
   let value;
   do {
     value = getRandomInteger(min, max);
@@ -19,10 +19,10 @@ export function getUniqueRandom (usedSet, min, max, errorMessage) {
   } while (usedSet.has(value));
   usedSet.add(value);
   return value;
-}
+};
 
-function getCommentMessage() {
-  const message = [];
+const getCommentMessage = () => {
+  const messages = [];
   const usedMessages = [];
   const messageAmount = getRandomInteger(1, 2);
   for (let i = 1; i <= messageAmount; i++) {
@@ -31,50 +31,47 @@ function getCommentMessage() {
       newMessage = COMMENTS[getRandomInteger(0, (COMMENTS.length - 1))];
     }
     usedMessages.push(newMessage);
-    message.push(newMessage);
+    messages.push(newMessage);
   }
-  return message.join(' ');
-}
+  return messages.join(' ');
+};
 
 
-function getCommentName(name, surname) {
+const getCommentName = (name, surname) => {
   const randomName = name[getRandomInteger(0, (name.length - 1))];
   const randomSurname = surname[getRandomInteger(0, (surname.length - 1))];
   return `${randomName} ${randomSurname}`;
-}
+};
 
-function generateComment () {
-  const comment = [];
+const generateComment = () => {
+  let comment;
   const id = getUniqueRandom(usedCommentId, 1, 750, 'Не могу найти уникальный ID комментария после 750 попыток');
 
-  comment.push({
+  comment = {
     commentId: id,
     commentUrl: `img/avatar-${getRandomInteger(1, 6)}.svg`,
     commentMessage: getCommentMessage(),
     commentName: getCommentName(NAMES, SURNAMES)
-  });
+  };
 
-  return comment;
-}
-
-const comments = (amount) => {
-  const commentBatch = [];
-  for (let i = 0; i < amount; i++) {
-    commentBatch.push(generateComment());
-  }
-  return commentBatch;
+  return comment
 };
 
-function photoDescription (id, url) {
+const comments = (amount) => {
+  const createdComments = [];
+  for (let i = 0; i < amount; i++) {
+    createdComments.push(generateComment());
+  }
+  return createdComments;
+};
 
-  return {
-    id: id,
-    url: url,
-    description: DESCRIPTION[getRandomInteger(0, (DESCRIPTION.length - 1))],
-    likes: getRandomInteger(15, 200),
-    comment: comments(getRandomInteger(1, 30))
-  };
-}
+const photoDescription = (id, url) => ({
+  id: id,
+  url: url,
+  description: DESCRIPTIONS[getRandomInteger(0, (DESCRIPTIONS.length - 1))],
+  likes: getRandomInteger(15, 200),
+  comment: comments(getRandomInteger(1, 30))
+});
 
 const uploadedPhotos = (amount) => {
   const usedId = new Set();
